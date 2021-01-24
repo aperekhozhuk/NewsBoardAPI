@@ -1,10 +1,11 @@
 from rest_framework import serializers
-from .models import Post, Comment
+from .models import Post, Comment, UpVote
 
 
 class PostSerializer(serializers.ModelSerializer):
 
     user_id = serializers.ReadOnlyField(source="user.id")
+    upvotes = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
@@ -19,8 +20,10 @@ class PostSerializer(serializers.ModelSerializer):
         )
         extra_kwargs = {
             "creation_date": {"read_only": True},
-            "upvotes": {"read_only": True},
         }
+
+    def get_upvotes(self, post):
+        return UpVote.objects.filter(post=post).count()
 
 
 class CommentSerializer(serializers.ModelSerializer):

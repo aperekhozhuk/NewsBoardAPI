@@ -8,7 +8,6 @@ class Post(models.Model):
     title = models.CharField(max_length=settings.TITLE_MAX_LENGTH)
     link = models.CharField(max_length=settings.LINK_MAX_LENGTH)
     creation_date = models.DateField(default=datetime.date.today)
-    upvotes = models.IntegerField(default=0)
     author_name = models.CharField(max_length=settings.AUTHOR_NAME_MAX_LENGTH)
     user = models.ForeignKey(User, related_name="posts", on_delete=models.CASCADE)
 
@@ -22,3 +21,13 @@ class Comment(models.Model):
     creation_date = models.DateField(default=datetime.date.today)
     user = models.ForeignKey(User, related_name="comments", on_delete=models.CASCADE)
     post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)
+
+
+class UpVote(models.Model):
+    class Meta:
+        unique_together = [
+            ["post", "user"],
+        ]
+
+    post = models.ForeignKey(Post, related_name="upvotes", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="upvotes", on_delete=models.CASCADE)

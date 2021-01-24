@@ -14,6 +14,11 @@ posts_router.register(r"comments", views.CommentViewSet, basename="post-comments
 
 urlpatterns = [
     path("get_token/", obtain_auth_token, name="get_token"),
+    path(
+        "posts/<int:post_pk>/upvote/",
+        views.PostUpVoteView.as_view(),
+        name="post-upvote",
+    ),
     path("", include(router.urls)),
     path("", include(posts_router.urls)),
 ]
