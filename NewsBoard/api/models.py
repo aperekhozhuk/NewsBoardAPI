@@ -14,3 +14,11 @@ class Post(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+
+class Comment(models.Model):
+    author_name = models.CharField(max_length=settings.AUTHOR_NAME_MAX_LENGTH)
+    content = models.TextField()
+    creation_date = models.DateField(default=datetime.date.today)
+    user = models.ForeignKey(User, related_name="comments", on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)

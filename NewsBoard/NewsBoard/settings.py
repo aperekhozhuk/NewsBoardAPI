@@ -49,7 +49,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-if DEBUG == True:
+if DEBUG:
     REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].extend(
         [
             "rest_framework.authentication.BasicAuthentication",
