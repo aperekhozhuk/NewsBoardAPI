@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+from celery.schedules import crontab
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -132,8 +133,28 @@ USE_L10N = True
 
 USE_TZ = True
 
+# We will run task for upvotes resetting everyday at 4am
+UPVOTES_RESET_TIME_HOUR = 4
+UPVOTES_RESET_TIME_MINUTE = 0
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = "/static/"
+
+# Celery
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TASK_SERIALIZER = "json"
+CELERY_BEAT_SCHEDULE = {
+    "reset_upvotes_everyday": {
+        "task": "api.tasks.reset_upvotes",
+        "schedule": crontab(
+            day_of_week="0-6",
+            hour=UPVOTES_RESET_TIME_HOUR,
+            minute=UPVOTES_RESET_TIME_MINUTE,
+        ),
+    },
+}
