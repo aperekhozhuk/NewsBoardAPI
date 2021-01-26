@@ -3,3 +3,4 @@ env
 **.sqlite3
 **.rdb
 **/celerybeat-schedule
+NewsBoard/staticfiles

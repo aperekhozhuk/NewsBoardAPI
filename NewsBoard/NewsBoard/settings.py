@@ -22,12 +22,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+SECRET_KEY = os.environ["SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = int(os.environ["DEBUG"])
 
-ALLOWED_HOSTS = []
+# In production environment admin site can be disallowed, for example
+ADMIN_ENABLED = int(os.environ["ADMIN_ENABLED"])
+
+ALLOWED_HOSTS = os.environ["ALLOWED_HOSTS"].split()
 
 
 # Application definition
@@ -50,6 +53,7 @@ REST_FRAMEWORK = {
     ],
 }
 
+# In debug mode session auth allowed for easy acess through browser
 if DEBUG:
     REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].extend(
         [
@@ -61,6 +65,7 @@ if DEBUG:
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -95,8 +100,12 @@ WSGI_APPLICATION = "NewsBoard.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": os.environ["DATABASE_ENGINE"],
+        "NAME": os.environ["DATABASE_NAME"],
+        "USER": os.environ["DATABASE_USER"],
+        "PASSWORD": os.environ["DATABASE_PASSWORD"],
+        "HOST": os.environ["DATABASE_HOST"],
+        "PORT": int(os.environ["DATABASE_PORT"]),
     }
 }
 
@@ -134,17 +143,20 @@ USE_L10N = True
 USE_TZ = True
 
 # We will run task for upvotes resetting everyday at 4am
-UPVOTES_RESET_TIME_HOUR = 4
-UPVOTES_RESET_TIME_MINUTE = 0
+UPVOTES_RESET_TIME_HOUR = int(os.environ["UPVOTES_RESET_TIME_HOUR"])
+UPVOTES_RESET_TIME_MINUTE = int(os.environ["UPVOTES_RESET_TIME_MINUTE"])
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATIC_URL = "/static/"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Celery
-CELERY_BROKER_URL = "redis://localhost:6379"
-CELERY_RESULT_BACKEND = "redis://localhost:6379"
+CELERY_TIMEZONE="UTC"
+CELERY_BROKER_URL = os.environ["CELERY_BROKER_URL"]
+CELERY_RESULT_BACKEND = os.environ["CELERY_RESULT_BACKEND"]
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
