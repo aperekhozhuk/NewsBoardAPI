@@ -1,0 +1,5 @@
+**/*.pyc
+**/*.sqlite3
+**/*.rdb
+NewsBoard/staticfiles
+NewsBoard/celerybeat-schedule
